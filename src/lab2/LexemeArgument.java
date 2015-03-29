@@ -15,9 +15,13 @@ public class LexemeArgument {
 
     @Override
     public String toString() {
-        return "LexemeArgument{" +
-                "type=" + type +
-                ", value=" + value +
-                '}';
+        switch (type) {
+            case REGISTER:
+                return "R" + (value + 1);
+            case MEMORY:
+                return "M" + (value + 1);
+            default:
+                return Integer.toString(value);
+        }
     }
 }

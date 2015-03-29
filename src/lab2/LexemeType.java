@@ -9,23 +9,26 @@ import java.util.regex.Pattern;
  */
 public enum LexemeType {
 
-    ADD("(ADD)"),
-    MOV("(MOV)"),
-    XOR("(XOR)"),
-    SEPARATOR("(,| )"),
-    REGISTER("(R[1-4])"),
-    MEMORY("(M[1-4])"),
-    NUMBER("([0-9]+)"),
-    COMMAND("(ADD|MOV|XOR)"),
-    ARGUMENT("(" + REGISTER + "|" + MEMORY + "|" + NUMBER + ")"),
-    COMMAND_LINE("(" + COMMAND.getRegex() +
-            SEPARATOR + ARGUMENT + SEPARATOR + ARGUMENT + SEPARATOR + ARGUMENT + "\\n" + ")"),
-    ERROR("ERROR");
+    ADD("ADD", "(ADD)"),
+    MOV("MOV", "(MOV)"),
+    XOR("XOR", "(XOR)"),
+    SEPARATOR("SEPARATOR", "(,? *)"),
+    REGISTER("REGISTER", "(R[1-4])"),
+    MEMORY("MEMORY", "(M[1-4])"),
+    NUMBER("NUMBER", "(-?[1-9][0-9]{0,8})"),
+    COMMAND("COMMAND", "(ADD|MOV|XOR)"),
+    REG_MEM("REGISTER_OR_MEMORY", "(" + REGISTER + "|" + MEMORY + ")"),
+    ARGUMENT("ARGUMENT", "(" + REGISTER + "|" + MEMORY + "|" + NUMBER + ")"),
+    COMMAND_LINE("COMMAND_LINE", "(" + COMMAND +
+            SEPARATOR + REG_MEM + SEPARATOR + ARGUMENT + SEPARATOR + ARGUMENT + ")"),
+    ERROR("ERROR", "ERROR");
 
+    private final String name;
     private final String regex;
     private final Pattern pattern;
 
-    LexemeType(String regex) {
+    LexemeType(String name, String regex) {
+        this.name = name;
         this.regex = regex;
         this.pattern = Pattern.compile(regex);
     }
@@ -35,12 +38,16 @@ public enum LexemeType {
         return regex;
     }
 
-    public Pattern getPattern() {
-        return pattern;
+    public String getName() {
+        return name;
     }
 
     public String getRegex() {
         return regex;
+    }
+
+    public Pattern getPattern() {
+        return pattern;
     }
 
     public static LexemeType getCommandLexeme(String line) {
@@ -52,13 +59,13 @@ public enum LexemeType {
         if (matcher.find()) {
             lexeme = matcher.group();
         }
-        if (lexeme.matches(ADD.toString())) {
+        if (lexeme.matches(ADD.getRegex())) {
             return ADD;
         }
-        if (lexeme.matches(MOV.toString())) {
+        if (lexeme.matches(MOV.getRegex())) {
             return MOV;
         }
-        if (lexeme.matches(XOR.toString())) {
+        if (lexeme.matches(XOR.getRegex())) {
             return XOR;
         }
         return ERROR;
@@ -72,11 +79,11 @@ public enum LexemeType {
         LexemeArgument[] args = new LexemeArgument[3];
         for (int i = 0; i < 3 && matcher.find(); i++) {
             String lexeme = matcher.group();
-            if (lexeme.matches(REGISTER.toString())) {
-                args[i] = new LexemeArgument(REGISTER, lexeme.charAt(1) - '0');
-            } else if (lexeme.matches(MEMORY.toString())) {
-                args[i] = new LexemeArgument(MEMORY, lexeme.charAt(1) - '0');
-            } else if (lexeme.matches(NUMBER.toString())) {
+            if (lexeme.matches(REGISTER.getRegex())) {
+                args[i] = new LexemeArgument(REGISTER, lexeme.charAt(1) - '1');
+            } else if (lexeme.matches(MEMORY.getRegex())) {
+                args[i] = new LexemeArgument(MEMORY, lexeme.charAt(1) - '1');
+            } else if (lexeme.matches(NUMBER.getRegex())) {
                 args[i] = new LexemeArgument(NUMBER, Integer.parseInt(lexeme));
             } else {
                 return null;
