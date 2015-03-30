@@ -15,7 +15,7 @@ public enum LexemeType {
     SEPARATOR("SEPARATOR", "(,? *)"),
     REGISTER("REGISTER", "(R[1-4])"),
     MEMORY("MEMORY", "(M[1-4])"),
-    NUMBER("NUMBER", "(-?[1-9][0-9]{0,8})"),
+    NUMBER("NUMBER", "((-?[1-9][0-9]{0,8})|(-?0))"),
     COMMAND("COMMAND", "(ADD|MOV|XOR)"),
     REG_MEM("REGISTER_OR_MEMORY", "(" + REGISTER + "|" + MEMORY + ")"),
     ARGUMENT("ARGUMENT", "(" + REGISTER + "|" + MEMORY + "|" + NUMBER + ")"),
